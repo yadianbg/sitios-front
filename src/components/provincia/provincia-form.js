@@ -50,7 +50,7 @@ function ProvinciaForm(props) {
                 style={{width: '50vw'}}
                 onHide={() => hide()}>
             <DialogTitle>
-                <Typography component={'h6'}> Crear Provincia </Typography>
+                <Typography component={'h6'}> {props.data.id != '' ? 'Modificar' : 'Crear'} Provincia </Typography>
             </DialogTitle>
             <DialogContent>
                 <TextField id="standard-basic" label="Id" variant="standard" value={id}
