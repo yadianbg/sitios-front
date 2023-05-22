@@ -11,8 +11,8 @@ export const pages = [{
   link: '/provincias',
   icon: ''
 }, {
-      title: 'Sitios',
-      link: '/sitios',
-      icon: ''
+  title: 'Sitios',
+  link: '/sitios',
+  icon: ''
 },
 ]

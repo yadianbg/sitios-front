@@ -1,41 +1,41 @@
 import React, {useEffect, useState} from 'react';
-import {Dialog, DialogActions, DialogContent, DialogTitle, TextField} from "@mui/material";
-import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import {Dialog, DialogActions, DialogContent, DialogTitle, TextField} from "@mui/material";
 import {ProvinciaService} from "../../service/provincia.service";
 
 function ProvinciaForm(props) {
-    const [id, setId] = useState('')
     const [codigo, setCodigo] = useState('')
     const [nombre, setNombre] = useState('')
 
     useEffect(() => {
         if(props.data.id != ''){
-            setId(props.data.id)
             setCodigo(props.data.codigo)
             setNombre(props.data.nombre)
         }
     }, [])
 
-    const createProvincia = () => {
-        const data = {
-            id: props.data.id ? props.data.id : id,
-            codigo: codigo,
-            nombre: nombre
-        }
+    const create = () => {
         if(props.data.id == '') {
-            ProvinciaService.create(data)
+            const obj = {
+                codigo: codigo,
+                nombre: nombre,
+            }
+            ProvinciaService.create(obj).then(() => props.reloadData())
         } else {
-            ProvinciaService.update(data)
+            const obj = {
+                id: props.data.id,
+                codigo: codigo,
+                nombre: nombre,
+            }
+            ProvinciaService.update(obj).then(() => props.reloadData())
             props.clean()
         }
-        props.reloadData()
         hide()
     }
 
     const clear = () => {
-        setId('')
         setCodigo('')
         setNombre('')
     }
@@ -50,23 +50,17 @@ function ProvinciaForm(props) {
                 style={{width: '50vw'}}
                 onHide={() => hide()}>
             <DialogTitle>
-                <Typography component={'h6'}> {props.data.id != '' ? 'Modificar' : 'Crear'} Provincia </Typography>
+                <Typography component={'h6'}> {props.data.id == '' ? 'Crear' : 'Editar'} Provincia </Typography>
             </DialogTitle>
-            <DialogContent>
-                <TextField id="standard-basic" label="Id" variant="standard" value={id}
-                           onChange={(e) => setId(e.target.value.trim())}/>
-            </DialogContent>
-            <DialogContent>
-                <TextField id="standard-basic" label="Código" variant="standard" value={codigo}
+            <DialogContent sx={{'display': 'flex', 'flexDirection': 'column', 'gap': 5, 'width': '500px'}}>
+                <TextField id="codigo" label="Código" variant="standard" value={codigo}
                            onChange={(e) => setCodigo(e.target.value.trim())}/>
-            </DialogContent>
-            <DialogContent>
-                <TextField id="standard-basic" label="Nombre" variant="standard" value={nombre}
+                <TextField id="nombre" label="Nombre" variant="standard" value={nombre}
                            onChange={(e) => setNombre(e.target.value.trim())}/>
             </DialogContent>
             <DialogActions>
                 <Box>
-                    <Button disabled={id.trim() == '' || codigo.trim() == '' || nombre.trim() == ''} onClick={() => createProvincia()}>Aceptar</Button>
+                    <Button disabled={codigo == '' || nombre == ''} onClick={() => create()}>Aceptar</Button>
                     <Button onClick={() => hide()}>Cancelar</Button>
                 </Box>
             </DialogActions>

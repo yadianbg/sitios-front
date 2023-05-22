@@ -10,7 +10,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 
 export function CustomTable(props) {
-    console.log("HERE")
+    //console.log("HERE")
     return (
         <TableContainer component={Paper} sx={{minWidth: 200}}>
             <Table sx={{minWidth: 650}} aria-label="simple table">
@@ -41,9 +41,9 @@ export function CustomTable(props) {
                             ))}
                             <TableCell component="td" scope="row" align="center">
                                 <Box>
+                                    {props.seeFunction && <Button onClick={() => props.seeFunction(row['id'])}>Ver</Button>}
                                     <Button onClick={() => props.editFunction(row['id'])}>Editar</Button>
                                     <Button onClick={() => props.deleteFunction(row['id'])}>Eliminar</Button>
-                                    {props.seeFunction && <Button onClick={() => props.seeFunction(row['id'])}>Ver</Button>}
                                 </Box>
                             </TableCell>
                         </TableRow>

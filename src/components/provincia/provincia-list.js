@@ -3,6 +3,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import {tableHeaderValues} from "../../config/table-values2";
 import {CustomTable} from "../table/custom-table";
+import AlertDialog from "../confirm-dialog/confirm";
 import {ProvinciaService} from "../../service/provincia.service";
 import ProvinciaForm from "./provincia-form";
 
@@ -11,23 +12,27 @@ function ProvinciaList(props) {
     const [data, setData] = useState([])
     const [test, setTest] = useState({id: '', codigo: '', nombre: ''})
     const [showForm, setShowForm] = useState(false)
+    const [showConfirm, setShowConfirm] = useState(false)
+    const [deleteId, setDeleteId] = useState('')
 
     const header = tableHeaderValues
+
     // useEffect es un hook que nos permite realizar una acción cuando el componente se inicio
     // es utilizado mayourmente para llamadas hacia APIS
-
     useEffect(() => {
         reloadData()
     }, [])
 
     const editFunction = (id) => {
-        const value = ProvinciaService.tableTestValues.filter(dat => dat.id == id)[0]
-        setTest({
-            id: value.id,
-            codigo: value.codigo,
-            nombre: value.nombre
+        ProvinciaService.retrieve(id).then((response) => {
+            //console.log(response)
+            setTest({
+                id: response.data.id,
+                codigo: response.data.codigo,
+                nombre: response.data.nombre
+            })
+            setShowForm(true);
         })
-        setShowForm(true);
     }
 
     const cleanEdit = () => {
@@ -35,18 +40,21 @@ function ProvinciaList(props) {
     }
 
     const deleteFunction = (id) => {
-        ProvinciaService.delete(id)
-        reloadData()
+        setDeleteId(id)
+        setShowConfirm(true)
+    }
+
+    const deleteSelected = () => {
+        ProvinciaService.delete(deleteId).then(() => reloadData())
     }
 
     const seeFunction = (id) => {
-        console.log('ID: ', id)
+        console.log('ID: ' + id)
     }
 
     const reloadData = () => {
-        setData(ProvinciaService.get())
+        ProvinciaService.get().then((response) => setData(response.data))
     }
-
 
     return (
         <>
@@ -55,21 +63,27 @@ function ProvinciaList(props) {
             </Typography>
             {showForm
                 && <ProvinciaForm dialogState={showForm}
-                                 setDialogState={setShowForm}
-                                 data={test}
-                                 clean={cleanEdit}
-                                 reloadData={reloadData}/>}
+                             setDialogState={setShowForm}
+                             data={test}
+                             clean={cleanEdit}
+                             reloadData={reloadData}/>}
+            {showConfirm &&
+                <AlertDialog
+                    deleteAction={deleteSelected}
+                    setConfirm={setShowConfirm}
+                    confirm={showConfirm}
+                />}
             <Button onClick={() => {
                 cleanEdit();
                 setShowForm(true);
             }}> Crear </Button>
 
             <CustomTable
-                data={ProvinciaService.get()}
                 header={header}
+                data={data}
+                seeFunction={seeFunction}
                 editFunction={editFunction}
                 deleteFunction={deleteFunction}
-                seeFunction={seeFunction}
             />
         </>
     );

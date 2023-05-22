@@ -2,6 +2,7 @@ import {createBrowserRouter} from "react-router-dom";
 import Layout from "../layout/layout";
 import TipoList from "../components/tipo/tipo-list";
 import ProvinciaList from "../components/provincia/provincia-list";
+import SitioList from "../components/sitio/sitio-list";
 
 export const route = createBrowserRouter([
     {
@@ -32,7 +33,7 @@ export const route = createBrowserRouter([
             },
             {
                 path: "sitios/",
-                element: <div>Listado de Sitios</div>,
+                element: <SitioList/>,
             }]
     },
 ])

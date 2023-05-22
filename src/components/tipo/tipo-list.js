@@ -3,6 +3,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import {tableHeaderValues} from "../../config/table-values";
 import {CustomTable} from "../table/custom-table";
+import AlertDialog from "../confirm-dialog/confirm";
 import {TipoService} from "../../service/tipo.service";
 import TipoForm from "./tipo-form";
 
@@ -11,22 +12,26 @@ function TipoList(props) {
     const [data, setData] = useState([])
     const [test, setTest] = useState({id: '', nombre: ''})
     const [showForm, setShowForm] = useState(false)
+    const [showConfirm, setShowConfirm] = useState(false)
+    const [deleteId, setDeleteId] = useState('')
 
     const header = tableHeaderValues
+
     // useEffect es un hook que nos permite realizar una acción cuando el componente se inicio
     // es utilizado mayourmente para llamadas hacia APIS
-
     useEffect(() => {
         reloadData()
     }, [])
 
     const editFunction = (id) => {
-        const value = TipoService.tableTestValues.filter(dat => dat.id == id)[0]
-        setTest({
-            id: value.id,
-            nombre: value.nombre
+        TipoService.retrieve(id).then((response) => {
+            //console.log(response)
+            setTest({
+                id: response.data.id,
+                nombre: response.data.nombre
+            })
+            setShowForm(true);
         })
-        setShowForm(true);
     }
 
     const cleanEdit = () => {
@@ -34,18 +39,21 @@ function TipoList(props) {
     }
 
     const deleteFunction = (id) => {
-        TipoService.delete(id)
-        reloadData()
+        setDeleteId(id)
+        setShowConfirm(true)
+    }
+
+    const deleteSelected = () => {
+        TipoService.delete(deleteId).then(() => reloadData())
     }
 
     const seeFunction = (id) => {
-        console.log('ID: ', id)
+        console.log('ID: ' + id)
     }
 
     const reloadData = () => {
-        setData(TipoService.get())
+        TipoService.get().then((response) => setData(response.data))
     }
-
 
     return (
         <>
@@ -58,17 +66,23 @@ function TipoList(props) {
                              data={test}
                              clean={cleanEdit}
                              reloadData={reloadData}/>}
+            {showConfirm &&
+                <AlertDialog
+                    deleteAction={deleteSelected}
+                    setConfirm={setShowConfirm}
+                    confirm={showConfirm}
+                />}
             <Button onClick={() => {
                 cleanEdit();
                 setShowForm(true);
             }}> Crear </Button>
 
             <CustomTable
-                data={TipoService.get()}
                 header={header}
+                data={data}
+                seeFunction={seeFunction}
                 editFunction={editFunction}
                 deleteFunction={deleteFunction}
-                seeFunction={seeFunction}
             />
         </>
     );
